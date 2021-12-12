@@ -2,34 +2,28 @@
 
 void Image::image_load() 
 {
-	//Read image info
-	FILE *file = fopen(IFile, "r");
-	if(fscanf(file, "%s", header)!=1){ 
-		cout << "read header error" << endl;
-		exit(1);
-	}
-	if(fscanf(file, "%d %d %d", &(width), &(height), &(color_depth))!=3){
-		cout << "read info error" << endl;
-		exit(1);
-	}
 
-	// Alocate memory for pixels
+	img = imread(input_file);
+	if(img.empty())
+	{
+		cout << "file open error " << endl;
+	}
+    height = img.rows;
+	width = img.cols;
+	cout << "width: " << width << "height: "<< height << endl;
 	pixels = new Pixel*[height];
 	for(int i = 0; i < height; i++)
 		pixels[i] = new Pixel[width];
 
 	// Read pixels
-	for(int i = 0; i < height; i++)
+	for(int i = 0; i < height; i++){
 		for(int j = 0; j < width; j++){
-			if(fscanf(file, "%c%c%c", &(pixels[i][j].R), &(pixels[i][j].G), &(pixels[i][j].B))!=3){
-				cout << "read pixel error" << endl;
-				exit(1);
-			}
-		}
-			
-	// Close file
-	fclose(file);
-
+			Vec3b &color = img.at<Vec3b>(i,j);//BGR
+			pixels[i][j].R = color[2];
+			pixels[i][j].G = color[1];
+			pixels[i][j].B = color[0];
+		}	
+	}
 }
 
 
@@ -64,6 +58,7 @@ void Image::apply_to_pixel(const int x, const int y, const GaussianKernel& kerne
 	pixels[y][x].B = res.B;
 }	
 
+
 void Image::GaussianFliter(const GaussianKernel& kernel)
 {
 	for(int y = 0; y < height; y++)
@@ -74,15 +69,18 @@ void Image::GaussianFliter(const GaussianKernel& kernel)
 
 void Image::image_write()
 {
-	FILE *file = fopen(OFile, "w");
-	fprintf(file, "%s\n%d %d\n%d", header, width, height, color_depth);
-	
-	for(int i = 0; i < height; i++)
-		for(int j = 0; j < width; j++)
-			fprintf(file, "%c%c%c", pixels[i][j].R, pixels[i][j].G, pixels[i][j].B);
-		
-	fprintf(file, "%d", EOF);
-	fclose(file);
+
+	for(int i = 0; i < height; i++){
+		for(int j = 0; j < width; j++){
+			Vec3b &color = img.at<Vec3b>(i,j);//BGR
+			color[0] = pixels[i][j].B;
+			color[1] = pixels[i][j].G;
+			color[2] = pixels[i][j].R;
+		}	
+	}
+    
+	imwrite(output_file, img);
+
 }
 	
 

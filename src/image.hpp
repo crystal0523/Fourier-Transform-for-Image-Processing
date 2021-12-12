@@ -3,24 +3,27 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <stdio.h>
 #include <stdlib.h>
 #include "pixel.hpp"
 #include "filter.hpp"
+#include <opencv2/opencv.hpp>
+#include <string>
 using namespace std;
-
+using namespace cv;
 class Image
 {
 
 public:
 
-	char *IFile, *OFile, *header;
+	string input_file, output_file;
 	int width, height, color_depth;
 	Pixel** pixels;
-	Image(char *input_file, char* output_file):IFile(input_file), OFile(output_file){};
-
+	Mat img;
+	Image(string input_file, string output_file):input_file(input_file), output_file(output_file){};
+	
 	~Image()
 	{
-		cout << "call of Image destructor" << endl;
 		for(int i = 0; i < height; i++)
 			delete [] pixels[i];
 		delete [] pixels;
@@ -33,7 +36,7 @@ public:
 	void image_load();
 	
 	void check();
-	//Apply a filter to the image
+
 	void apply_to_pixel(const int x, const int y, const GaussianKernel& kernel);
 	
 	void GaussianFliter(const GaussianKernel& kernel);

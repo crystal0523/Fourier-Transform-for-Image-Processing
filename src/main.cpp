@@ -1,15 +1,14 @@
 #include "image.hpp"
 #include <iostream>
-#define NAME_WIDTH 100
 
 using namespace std;
 
 int main(int argc, char *argv[]) {
 
 	// Original image file name
-	char image_file_name[NAME_WIDTH] = "visit0000.ppm", result_file_name[NAME_WIDTH]="happy1.ppm", header[3];
-	int radius=5;
-	double sigma=0.5;
+	string image_file_name= "../img/Lenna.png", result_file_name= "filter.png";
+	int radius = 5;
+	double sigma = 10;
 
 	/*cout << "Original image name: " << endl;
 	cin >> image_file_name;
@@ -30,17 +29,16 @@ int main(int argc, char *argv[]) {
     Image img(image_file_name, result_file_name);
 
 	img.image_load();
-	img.check();
-	// Apply filter
+
+	//img.check();
+	
 	cout << "Appling filter..." << endl;
 	img.GaussianFliter(kernel);
 
-	// Write image to disk
 	cout << "Writing image to disk..." << endl;
 	img.image_write();
 
-
-	printf("DONE!\n");
+	cout << "DONE!"<< endl;
 
 	return 0;
 }
