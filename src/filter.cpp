@@ -6,15 +6,15 @@ void GaussianKernel::Calculation()
 	double sum = 0.0;
 	for(int i = -radius; i <= radius; i++)
 		for(int j = -radius; j <= radius; j++) {
-			matrix[i+radius][j+radius] = gauss_2d(j, i, sigma);
-			sum += matrix[i+radius][j+radius];
+			matrix[ (i + radius ) * dim + j + radius] = gauss_2d(j, i, sigma);
+			sum += matrix[(i + radius) * dim + j + radius];
 		}
 
 	// normalization
 	for(int i = 0; i < dim; i++)
 		for(int j = 0; j < dim; j++)
 		{
-			matrix[i][j] /= sum;
+			matrix[i * dim + j] /= sum;
 		}
 			
 }

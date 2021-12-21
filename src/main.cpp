@@ -1,5 +1,4 @@
 #include "image.hpp"
-#include <iostream>
 
 using namespace std;
 
@@ -8,7 +7,7 @@ int main(int argc, char *argv[]) {
 	// Original image file name
 	string image_file_name= "../img/Lenna.png", result_file_name= "filter.png";
 	int radius = 5;
-	double sigma = 10;
+	double sigma = 5;
 
 	/*cout << "Original image name: " << endl;
 	cin >> image_file_name;
@@ -30,14 +29,18 @@ int main(int argc, char *argv[]) {
 
 	img.image_load();
 
-	//img.check();
-	
-	cout << "Appling filter..." << endl;
+	cout << "Appling Gaussian filter..." << endl;
 	img.GaussianFliter(kernel);
 
+	cout << "Appling to grey filter..." << endl;
+	img.to_grey();
+	
+	cout << "Appling to sobel filter..." << endl;
+	img.SobelFliter();
+	
 	cout << "Writing image to disk..." << endl;
-	img.image_write();
-
+	img.image_writeGrey();
+	//img.image_writeRGB();
 	cout << "DONE!"<< endl;
 
 	return 0;
