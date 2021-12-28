@@ -1,16 +1,21 @@
-CXX = g++
-CFLAGS = -std=c++14 -O3 -m64
+CXX = clang++
+CFLAGS = -std=c++11 -O3 -m64 -fPIC -shared
 opencv = `pkg-config opencv --cflags --libs`
+
+
+pybind11 = `python3 -m pybind11 --includes`
+suffix = `python3-config --extension-suffix`
+
 .PHONY: all, clean
 
-all: target
+all: _image
 
-target: main.cpp filter.cpp image.cpp
-	$(CXX) $(CFLAGS) $^ -o $@ $(opencv)
+_image: bind.cpp
+	$(CXX) $(CFLAGS) $(pybind11) $^ -o _image$(suffix) $(opencv)
 
-
+#-I/usr/include/python3.8
 clean: 
-	rm -rf *.o target
+	rm -rf *.o _image
 
 
 	
