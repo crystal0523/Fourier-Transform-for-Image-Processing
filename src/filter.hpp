@@ -36,49 +36,7 @@ public:
 		}
 		else matrix = nullptr;
 	}
-	/*
-	GaussianKernel(GaussianKernel const & other)
-    {
-		cout << "call of copy constructor" << endl;
-        for (size_t i=0; i<dim; ++i)
-        {
-            for (size_t j=0; j<dim; ++j)
-            {
-                (*this).matrix[i*dim+j] = other.matrix[i*dim+j];
-            }
-        }
-    }
-
-    GaussianKernel & operator=(GaussianKernel const & other)
-    {
-		cout << "call of copy assignment" << endl;
-        if (this == &other) { return *this; }
-        
-        for (size_t i=0; i<dim; ++i)
-        {
-            for (size_t j=0; j<dim; ++j)
-            {
-                (*this).matrix[i*dim+j] = other.matrix[i*dim+j];
-            }
-        }
-       
-        return *this;
-    }
-
-    GaussianKernel(GaussianKernel && other)
-    {
-		cout << "call of move constructor" << endl;
-        std::swap(matrix, other.matrix);
-    }
-
-    GaussianKernel & operator=(GaussianKernel && other)
-    {
-		cout << "call of move assignment" << endl;
-        if (this == &other) { return *this; }
-        std::swap(matrix, other.matrix);
-        return *this;
-    }*/
-
+	
 	~GaussianKernel()
 	{
 		cout << "call of GaussianKernel destructor" << endl;

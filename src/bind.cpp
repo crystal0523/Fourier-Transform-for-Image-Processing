@@ -21,9 +21,14 @@ PYBIND11_MODULE(_image, m) {
 
     py::class_<Image>(m, "Image")
         .def(py::init<const std::string &, const std::string &>())
+        .def("__getitem__", [](Image &m, std::pair<int, int>i){
+            return m(i.first, i.second);
+        }, py::is_operator())
+        .def_readonly("height", &Image::height)
+        .def_readonly("width", &Image::width)
         .def("image_load", &Image::image_load)
-        .def("GaussianFliter", &Image::GaussianFliter)
+        .def("GaussianFilter", &Image::GaussianFilter)
         .def("to_grey", &Image::to_grey)
-        .def("SobelFliter", &Image::SobelFliter)
+        .def("SobelFilter", &Image::SobelFilter)
         .def("image_write", &Image::image_write);
 }

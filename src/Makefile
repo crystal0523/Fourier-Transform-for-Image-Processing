@@ -13,7 +13,6 @@ all: _image
 _image: bind.cpp
 	$(CXX) $(CFLAGS) $(pybind11) $^ -o _image$(suffix) $(opencv)
 
-#-I/usr/include/python3.8
 clean: 
 	rm -rf *.o _image
 

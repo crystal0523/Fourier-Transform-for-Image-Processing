@@ -4,6 +4,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include "omp.h"
 #include "pixel.hpp"
 #include "filter.hpp"
 #include <opencv2/opencv.hpp>
@@ -28,6 +29,8 @@ public:
 		{
 			delete [] pixelsGrey;
 		}
+		delete [] FreqImag;
+		delete [] FreqReal;
 		
 	}
 	//Image(Image const &) = default;
@@ -60,6 +63,9 @@ public:
 		
 		return pixels;
 	}
+
+	unsigned char operator() (int row, int col) const { return pixelsGrey[row * width + col]; }
+
 	void image_load()
 	{
 		img = imread(input_file);
@@ -70,7 +76,8 @@ public:
 		height = img.rows;
 		width = img.cols;
 		channel = img.channels();
-		
+		FreqReal = new double[height * width];
+		FreqImag = new double [height * width];
 		cout << "width: " << width << " height: "<< height << endl;
 		
 		// color image
@@ -79,6 +86,7 @@ public:
 			pixelsRGB = set_RGB_buffer();
 
 			// Read pixels
+			#pragma omp parallel for
 			for(int i = 0; i < height; i++)
 			{
 				for(int j = 0; j < width; j++)
@@ -94,6 +102,7 @@ public:
 		else if(channel==1)
 		{
 			pixelsGrey = set_Grey_buffer();
+			#pragma omp parallel for
 			for(int i = 0; i < height; i++)
 			{
 				for(int j = 0; j < width; j++)
@@ -110,10 +119,12 @@ public:
 	}
 	
 	//void check();
-
+	
+	
 	void to_grey()
 	{
 		pixelsGrey = set_Grey_buffer();
+		#pragma omp parallel for
 		for(int i = 0; i < height; i++)
 		{
 			for(int j = 0; j < width; j++)
@@ -132,7 +143,7 @@ public:
 		Pixel res;
 		res.R = res.G = res.B = 0;
 		double fil;
-
+		#pragma omp parallel for
 		for(int i = -kernel.radius; i <= kernel.radius; i++) 
 			for(int j = -kernel.radius; j <= kernel.radius; j++) 
 			{
@@ -152,7 +163,7 @@ public:
 
 		unsigned char res = 0;
 		double fil;
-
+		#pragma omp parallel reduction(+: res)
 		for(int i = -kernel.radius; i <= kernel.radius; i++) 
 			for(int j = -kernel.radius; j <= kernel.radius; j++) 
 			{
@@ -164,8 +175,9 @@ public:
 		pixelsGrey[y*width+x]= res;
 	}
 	
-	void GaussianFliter(const GaussianKernel& kernel)
+	void GaussianFilter(const GaussianKernel& kernel)
 	{
+		#pragma omp parallel for
 		for(int y = 0; y < height; y++)
 			for(int x = 0; x < width; x++)
 			{
@@ -174,7 +186,7 @@ public:
 			}
 	}
 
-	void SobelFliter_axis(const vector<int>& sobel_kernel)
+	void SobelFilter_axis(const vector<int>& sobel_kernel)
 	{
 		int kernel_size = 3;      
   
@@ -207,14 +219,15 @@ public:
 			}
 		}
 	}
-	void SobelFliter_axisXY(const vector<int>& sobel_kernelX, const vector<int>& sobel_kernelY)
+	
+	void SobelFilter_axisXY(const vector<int>& sobel_kernelX, const vector<int>& sobel_kernelY)
 	{
 		 int kernel_size = 3;
 
 		unsigned char * tmp = set_Grey_buffer();
 		int size = width * height * sizeof(unsigned char);
 		memcpy(tmp, pixelsGrey,size);
-
+		#pragma omp parallel for
 		for (int row = 0; row < height; ++row) 
 		{
 			for (int col = 0; col < width ; col += 1) 
@@ -245,19 +258,20 @@ public:
 	}
 
 	// img need to transform to greyscale first
-	void SobelFliter()
+	void SobelFilter()
 	{
 		vector<int>x = {1,0,-1,2,0,-2, 1,0,-1};
 		vector<int>y = {1,2,1,0,0,0,-1,-2,-1};
-		SobelFliter_axis(x);
-		SobelFliter_axis(y);
-		SobelFliter_axisXY(x, y);
+		SobelFilter_axis(x);
+		SobelFilter_axis(y);
+		SobelFilter_axisXY(x, y);
 	}
 
 	void image_write()
 	{
 		if(channel==3)
 		{
+			#pragma omp parallel for
 			for(int i = 0; i < height; i++){
 				for(int j = 0; j < width; j++){
 					Vec3b &color = img.at<Vec3b>(i,j);//BGR
@@ -278,6 +292,7 @@ public:
 
 	string input_file, output_file;
 	int width, height, channel;
+	double* FreqImag, *FreqReal;
 	Pixel* pixelsRGB = nullptr;
 	unsigned char * pixelsGrey = nullptr;
 	Mat img;
